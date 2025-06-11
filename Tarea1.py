@@ -110,7 +110,7 @@ for d in depth_range_ext:
     test_acc.append(accuracy_score(y_test, clf.predict(X_test)))
 
 # Graficar nuevo resultado más detallado
-plt.style.use('seaborn-vibrant')  # Cambia el estilo del gráfico (opcional)
+plt.style.use('ggplot')   # Cambia el estilo del gráfico (opcional)
 plt.figure(figsize=(8, 5))
 plt.plot(depth_range_ext, train_acc, marker='o', label="Train Accuracy", linewidth=2)
 plt.plot(depth_range_ext, test_acc, marker='o', label="Test Accuracy", linewidth=2)
