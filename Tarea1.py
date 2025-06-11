@@ -122,3 +122,80 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+
+
+
+#3
+print('PASOO 3----------------------------------')
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Crear y entrenar modelo óptimo
+best_model = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    min_samples_split=4,
+    random_state=42
+)
+best_model.fit(X_train, y_train)
+
+# Predicción
+y_pred = best_model.predict(X_test)
+
+# Matriz de confusión
+cm = confusion_matrix(y_test, y_pred)
+print("Matriz de Confusión:")
+print(cm)
+
+# Reporte de clasificación (incluye precision, recall y f1-score)
+report = classification_report(y_test, y_pred, target_names=["NO", "YES"], output_dict=True)
+df_report = pd.DataFrame(report).transpose()
+print("\nReporte de Clasificación:")
+print(df_report)
+
+# Accuracy promedio por clase (igual que macro avg recall)
+accuracy_promedio = df_report.loc[["NO", "YES"], "recall"].mean()
+print(f"\nAccuracy global: {accuracy_score(y_test, y_pred):.2f}")
+print(f"Accuracy promedio por clase: {accuracy_promedio:.2f}")
+
+
+
+
+
+print('PASOO 4----------------------------------')
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
+
+# Número original de características
+n_features = X.shape[1]
+
+# Función para evaluar modelo con reducción de dimensionalidad
+def evaluar_con_pca(n_componentes):
+    print(f"\n--- PCA con {n_componentes} componentes ---")
+    # Crear pipeline con PCA + RandomForest
+    pipeline = Pipeline([
+        ("pca", PCA(n_components=n_componentes)),
+        ("clf", RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_split=4, random_state=42))
+    ])
+    
+    # Entrenar
+    pipeline.fit(X_train, y_train)
+    y_pred = pipeline.predict(X_test)
+
+    # Métricas
+    acc = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred, output_dict=True)
+    recall_prom = (report["0"]["recall"] + report["1"]["recall"]) / 2
+
+    print(f"Accuracy: {acc:.2f}")
+    print(f"Accuracy promedio por clase (recall): {recall_prom:.2f}")
+    print(f"Precisión clase YES: {report['1']['precision']:.2f}")
+    print(f"Recall clase YES: {report['1']['recall']:.2f}")
+    print(f"Precisión clase NO: {report['0']['precision']:.2f}")
+    print(f"Recall clase NO: {report['0']['recall']:.2f}")
+
+# Probar con la mitad de las características
+evaluar_con_pca(n_features // 2)
+
+# Probar con solo 2 componentes
+evaluar_con_pca(2)
